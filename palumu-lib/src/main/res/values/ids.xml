@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="video_page_frame_head" type="id" />
+    <item name="video_page_frame_body" type="id" />
+</resources>
