@@ -50,7 +50,7 @@ Add the frame into the specified view.
 val videoPageFrame = ScalablePageFrame(context)
 videoPageFrame.init(headView, bodyView, root)
 ```
-It alos supports fullscreen, just add few lines of code into onConfigurationChanged.
+It also supports fullscreen, just add few lines of code into onConfigurationChanged.
 
 ![](https://github.com/ivanisidrowu/palumu/blob/master/demo/palumu-page-fullscreen.gif)
 
