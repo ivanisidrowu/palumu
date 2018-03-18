@@ -81,3 +81,5 @@ dependencies {
 ## Contribution
 Contributions are always welcome. If you have any ideas or suggestions, you can contact me or create a github issue.
 
+## Sample videos and images
+I do not own the videos and images. I use these videos and images from http://www.sample-videos.com/
