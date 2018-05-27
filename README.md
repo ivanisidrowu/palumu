@@ -86,6 +86,6 @@ Contributions are always welcome. If you have any ideas or suggestions, you can 
 ## TODOs
 - [ ] Allow sharing floating views across activities.
 - [ ] ScalablePageFrame supports taking fragments as the content of upper and lower view.
-
+- [ ] To implement new floating UI style like current Youtube APP (2018/05/27)
 ## Sample videos and images
 I do not own the videos and images. I use these videos and images from http://www.sample-videos.com/
