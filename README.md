@@ -1,6 +1,8 @@
 # Palumu
 
+[![Jitpack](https://jitpack.io/v/ivanisidrowu/palumu.svg)](https://jitpack.io/#ivanisidrowu/palumu)
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Palulmu-blue.svg?style=flat)](https://android-arsenal.com/details/1/6898)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 A floating view helper lib to let you create floating view above other views!
 
