@@ -35,7 +35,8 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.4.0'
     implementation 'com.facebook.stetho:stetho:1.5.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.4.0'
-    compile 'com.github.ivanisidrowu:palumu:0.9.1'
+//    compile 'com.github.ivanisidrowu:palumu:0.9.1'
+    compile project(':palumu-lib')
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'

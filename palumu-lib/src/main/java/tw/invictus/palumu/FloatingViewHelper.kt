@@ -106,19 +106,18 @@ class FloatingViewHelper {
             toView.getLocationOnScreen(locTo)
 
             val rect = Rect()
-            toView.getGlobalVisibleRect(rect)
+            toView.getLocalVisibleRect(rect)
             val newY = locTo[1] - topBorder
-            val halfTargetHeight = toView.measuredHeight / 2
-            val isTopOverCovered = topBorder - locTo[1] > halfTargetHeight
-            val isBottomOverCovered = (screenHeight - bottomBorder) - locTo[1] < halfTargetHeight
-            val isHorizontallyOverCovered = rect.width() < toView.measuredWidth / 2
+            val isTopOverCovered = listener?.isViewTopOverCovered() ?: false
+            val isBottomOverCovered = listener?.isViewBottomOverCovered() ?: false
+            val isHorizontallyOverCovered = listener?.isViewHorizontalOverCovered() ?: false
             Log.d(tag, "$isTopOverCovered, $isBottomOverCovered, $isHorizontallyOverCovered")
             // set view with toView visible bounds
             if (!isTopOverCovered && !isBottomOverCovered && !isHorizontallyOverCovered) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                     fromView.clipBounds = rect
                 }
-                fromView.x = locTo[0].toFloat()
+                fromView.x = toView.x
                 fromView.y = newY.toFloat()
                 listener?.onViewDragged(true)
             } else {

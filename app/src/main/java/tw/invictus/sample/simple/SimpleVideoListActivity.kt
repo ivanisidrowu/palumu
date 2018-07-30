@@ -16,14 +16,14 @@ import android.view.WindowManager
 import android.widget.TextView
 import com.google.android.exoplayer2.Player
 import kotlinx.android.synthetic.main.activity_simple_video_list.*
-import tw.invictus.sample.ExoVideoPlayer
-import tw.invictus.sample.R
-import tw.invictus.sample.data.DataProviderImpl
-import tw.invictus.sample.data.Video
 import tw.invictus.palumu.FloatingViewHelper
 import tw.invictus.palumu.FloatingViewListener
 import tw.invictus.palumu.ScalablePageFrame
 import tw.invictus.palumu.ScalablePageFrameListener
+import tw.invictus.sample.ExoVideoPlayer
+import tw.invictus.sample.R
+import tw.invictus.sample.data.DataProviderImpl
+import tw.invictus.sample.data.Video
 
 /**
  * Created by ivan on 07/03/2018.
@@ -170,6 +170,18 @@ class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, 
         return itemView?.findViewById(R.id.image)
     }
 
+    override fun isViewTopOverCovered(): Boolean {
+        return false
+    }
+
+    override fun isViewBottomOverCovered(): Boolean {
+        return false
+    }
+
+    override fun isViewHorizontalOverCovered(): Boolean {
+        return false
+    }
+
     private fun modifyFullScreenSettings(isFullScreen: Boolean) {
         if (isFullScreen) {
             window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -242,4 +254,5 @@ class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, 
             floatingPlayer.play(adapter.data[currentAdapterPosition].url)
         }
     }
+
 }

@@ -21,4 +21,7 @@ import android.view.View
 interface FloatingViewListener {
     fun onViewDragged(isVisible: Boolean)
     fun getTargetView(): View?
+    fun isViewTopOverCovered(): Boolean
+    fun isViewBottomOverCovered(): Boolean
+    fun isViewHorizontalOverCovered(): Boolean
 }
