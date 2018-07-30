@@ -106,7 +106,7 @@ class FloatingViewHelper {
             toView.getLocationOnScreen(locTo)
 
             val rect = Rect()
-            toView.getLocalVisibleRect(rect)
+            toView.getGlobalVisibleRect(rect)
             val newY = locTo[1] - topBorder
             val halfTargetHeight = toView.measuredHeight / 2
             val isTopOverCovered = topBorder - locTo[1] > halfTargetHeight
