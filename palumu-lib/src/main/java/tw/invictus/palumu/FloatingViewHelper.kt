@@ -42,6 +42,7 @@ class FloatingViewHelper {
 
     private var recyclerScrollListener: RecyclerView.OnScrollListener? = null
     private var scrollChangedListener: ViewTreeObserver.OnScrollChangedListener? = null
+    private var targetViewOnLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
     private var originX = 0f
     private var originY = 0f
     private var originWidth: Int = 0
@@ -70,15 +71,16 @@ class FloatingViewHelper {
 
         if (targetView != null && theFloatingView != null && theRecyclerView != null) {
             val rootView = theRecyclerView.parent as ViewGroup
-            val layoutParams: ViewGroup.LayoutParams
+            var layoutParams: ViewGroup.LayoutParams
             if (theFloatingView.parent != null) {
-
-                if (targetView.measuredHeight != theFloatingView.measuredHeight) {
-                    layoutParams = theFloatingView.layoutParams
-                    layoutParams.height = targetView.height
-                    theFloatingView.requestLayout()
+                removeTargetViewLayoutChangeListener()
+                targetViewOnLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+                    if (targetView.measuredHeight != theFloatingView.measuredHeight) {
+                        layoutParams = theFloatingView.layoutParams
+                        layoutParams.height = targetView.height
+                        theFloatingView.requestLayout()
+                    }
                 }
-
             } else {
                 layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, targetView.measuredHeight)
                 rootView.addView(theFloatingView, layoutParams)
@@ -92,6 +94,7 @@ class FloatingViewHelper {
     }
 
     fun detachFloatingView() {
+        removeTargetViewLayoutChangeListener()
         val rootView = recyclerView?.parent as ViewGroup?
         floatingView?.let {
             it.x = 0f
@@ -168,6 +171,7 @@ class FloatingViewHelper {
 
     fun addScrollChangeListenerToCurrentTarget() {
         val targetView = listener?.getTargetView()
+        removeScrollChangeListenerToCurrentTarget()
         if (targetView != null) {
             scrollChangedListener = ViewTreeObserver.OnScrollChangedListener {
                 if (!isFullScreen && currentScrollState != RecyclerView.SCROLL_STATE_IDLE) {
@@ -182,6 +186,10 @@ class FloatingViewHelper {
     fun removeScrollChangeListenerToCurrentTarget() {
         val targetView = listener?.getTargetView()
         targetView?.viewTreeObserver?.removeOnScrollChangedListener(scrollChangedListener)
+    }
+
+    fun removeTargetViewLayoutChangeListener() {
+        targetViewOnLayoutListener?.let { listener?.getTargetView()?.viewTreeObserver?.removeOnGlobalLayoutListener(it) }
     }
 
     private fun addRecyclerScrollListener() {
