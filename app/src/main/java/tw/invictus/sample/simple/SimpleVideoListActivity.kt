@@ -41,11 +41,7 @@ class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, 
     private var currentAdapterPosition = 0
     private var floatingViewHelper: FloatingViewHelper? = null
     private val uiHandler = Handler()
-    private val floatingViewStartRunnable = object : Runnable {
-        override fun run() {
-            floatingViewHelper?.start()
-        }
-    }
+    private val floatingViewStartRunnable = Runnable { floatingViewHelper?.start() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -170,15 +166,15 @@ class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, 
         return itemView?.findViewById(R.id.image)
     }
 
-    override fun isViewTopOverCovered(): Boolean {
+    override fun isViewTopOverCovered(target: View?): Boolean {
         return false
     }
 
-    override fun isViewBottomOverCovered(): Boolean {
+    override fun isViewBottomOverCovered(target: View?): Boolean {
         return false
     }
 
-    override fun isViewHorizontalOverCovered(): Boolean {
+    override fun isViewHorizontalOverCovered(target: View?): Boolean {
         return false
     }
 
