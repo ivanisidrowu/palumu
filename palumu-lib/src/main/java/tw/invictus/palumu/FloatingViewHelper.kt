@@ -42,7 +42,7 @@ class FloatingViewHelper {
 
     private var recyclerScrollListener: RecyclerView.OnScrollListener? = null
     private var scrollChangedListener: ViewTreeObserver.OnScrollChangedListener? = null
-    private var targetViewOnLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+    private var targetViewOnLayoutListener: View.OnLayoutChangeListener? = null
     private var originX = 0f
     private var originY = 0f
     private var originWidth: Int = 0
@@ -74,13 +74,14 @@ class FloatingViewHelper {
             var layoutParams: ViewGroup.LayoutParams
             if (theFloatingView.parent != null) {
                 removeTargetViewLayoutChangeListener()
-                targetViewOnLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+                targetViewOnLayoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
                     if (targetView.measuredHeight != theFloatingView.measuredHeight) {
                         layoutParams = theFloatingView.layoutParams
                         layoutParams.height = targetView.height
                         theFloatingView.requestLayout()
                     }
                 }
+                targetView.addOnLayoutChangeListener(targetViewOnLayoutListener)
             } else {
                 layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, targetView.measuredHeight)
                 rootView.addView(theFloatingView, layoutParams)
@@ -189,7 +190,7 @@ class FloatingViewHelper {
     }
 
     fun removeTargetViewLayoutChangeListener() {
-        targetViewOnLayoutListener?.let { listener?.getTargetView()?.viewTreeObserver?.removeOnGlobalLayoutListener(it) }
+        targetViewOnLayoutListener?.let { listener?.getTargetView()?.removeOnLayoutChangeListener(it) }
     }
 
     private fun addRecyclerScrollListener() {
