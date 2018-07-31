@@ -166,15 +166,7 @@ class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, 
         return itemView?.findViewById(R.id.image)
     }
 
-    override fun isViewTopOverCovered(target: View?): Boolean {
-        return false
-    }
-
-    override fun isViewBottomOverCovered(target: View?): Boolean {
-        return false
-    }
-
-    override fun isViewHorizontalOverCovered(target: View?): Boolean {
+    override fun isViewOverCovered(target: View?): Boolean {
         return false
     }
 
