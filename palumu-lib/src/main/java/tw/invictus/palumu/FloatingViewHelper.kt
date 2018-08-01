@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Point
 import android.graphics.Rect
 import android.os.Build
+import android.os.Handler
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
@@ -40,6 +41,11 @@ class FloatingViewHelper {
     var topBorder = 0
     var bottomBorder = 0
 
+    private val uiHandler = Handler()
+    private val changeFloatingViewHeightRunnable = Runnable {
+        listener?.getTargetView()?.let { floatingView?.layoutParams?.height = it.measuredHeight }
+    }
+
     private var recyclerScrollListener: RecyclerView.OnScrollListener? = null
     private var scrollChangedListener: ViewTreeObserver.OnScrollChangedListener? = null
     private var targetViewOnLayoutListener: View.OnLayoutChangeListener? = null
@@ -51,7 +57,7 @@ class FloatingViewHelper {
 
     fun start() {
         getScreenHeight()
-        moveFloatingView(floatingView, listener?.getTargetView())
+        moveFloatingView(floatingView, getTargetView())
         addRecyclerScrollListener()
     }
 
@@ -65,28 +71,16 @@ class FloatingViewHelper {
     }
 
     fun attachFloatingView() {
-        val targetView = listener?.getTargetView()
+        val targetView = getTargetView()
         val theFloatingView = floatingView
         val theRecyclerView = recyclerView
 
         if (targetView != null && theFloatingView != null && theRecyclerView != null) {
             val rootView = theRecyclerView.parent as ViewGroup
-            var layoutParams: ViewGroup.LayoutParams
-            if (theFloatingView.parent != null) {
-                removeTargetViewLayoutChangeListener()
-                targetViewOnLayoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-                    if (targetView.measuredHeight != theFloatingView.measuredHeight) {
-                        layoutParams = theFloatingView.layoutParams
-                        layoutParams.height = targetView.height
-                        theFloatingView.requestLayout()
-                    }
-                }
-                targetView.addOnLayoutChangeListener(targetViewOnLayoutListener)
-            } else {
-                layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, targetView.measuredHeight)
+            if (theFloatingView.parent == null) {
+                val layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, targetView.measuredHeight)
                 rootView.addView(theFloatingView, layoutParams)
             }
-
         } else {
             Log.e(tag, "attachFollowerView: view is null!")
         }
@@ -95,7 +89,7 @@ class FloatingViewHelper {
     }
 
     fun detachFloatingView() {
-        removeTargetViewLayoutChangeListener()
+        removeTargetViewLayoutChangeListener(listener?.getTargetView())
         val rootView = recyclerView?.parent as ViewGroup?
         floatingView?.let {
             it.x = 0f
@@ -171,12 +165,12 @@ class FloatingViewHelper {
     }
 
     fun addScrollChangeListenerToCurrentTarget() {
-        val targetView = listener?.getTargetView()
+        val targetView = getTargetView()
         removeScrollChangeListenerToCurrentTarget()
         if (targetView != null) {
             scrollChangedListener = ViewTreeObserver.OnScrollChangedListener {
                 if (!isFullScreen && currentScrollState != RecyclerView.SCROLL_STATE_IDLE) {
-                    val target = listener?.getTargetView()
+                    val target = getTargetView()
                     moveFloatingView(floatingView, target)
                 }
             }
@@ -189,8 +183,8 @@ class FloatingViewHelper {
         targetView?.viewTreeObserver?.removeOnScrollChangedListener(scrollChangedListener)
     }
 
-    fun removeTargetViewLayoutChangeListener() {
-        targetViewOnLayoutListener?.let { listener?.getTargetView()?.removeOnLayoutChangeListener(it) }
+    fun removeTargetViewLayoutChangeListener(target: View?) {
+        targetViewOnLayoutListener?.let { target?.removeOnLayoutChangeListener(it) }
     }
 
     private fun addRecyclerScrollListener() {
@@ -201,7 +195,7 @@ class FloatingViewHelper {
                     if (!isFullScreen) {
                         currentScrollState = newState
                         if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                            listener?.getTargetView()?.let { moveFloatingView(floatingView, it) }
+                            getTargetView()?.let { moveFloatingView(floatingView, it) }
                         }
                     }
                 }
@@ -224,5 +218,20 @@ class FloatingViewHelper {
             display.getSize(point)
             screenHeight = point.y
         }
+    }
+
+    private fun getTargetView(): View? {
+        val targetView = listener?.getTargetView()
+        val theFloatingView = floatingView
+
+        if (targetView != null && theFloatingView != null) {
+            removeTargetViewLayoutChangeListener(targetView)
+            targetViewOnLayoutListener = View.OnLayoutChangeListener {
+                _, _, _, _, _, _, _, _, _ ->
+                uiHandler.post(changeFloatingViewHeightRunnable)
+            }
+            targetView.addOnLayoutChangeListener(targetViewOnLayoutListener)
+        }
+        return targetView
     }
 }
