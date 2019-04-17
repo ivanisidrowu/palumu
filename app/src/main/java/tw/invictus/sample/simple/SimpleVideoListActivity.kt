@@ -30,14 +30,11 @@ import tw.invictus.sample.data.Video
  */
 class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, FloatingViewListener {
 
-    private val tag = this.javaClass.simpleName
     private lateinit var floatingPlayer: ExoVideoPlayer
-
     private lateinit var adapter: SimpleVideoListAdapter
     private lateinit var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener
 
     private var videoPageFrame: ScalablePageFrame? = null
-    private var bodyView: TextView? = null
     private var currentAdapterPosition = 0
     private var floatingViewHelper: FloatingViewHelper? = null
     private val uiHandler = Handler()
@@ -47,13 +44,13 @@ class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_simple_video_list)
 
-        val layoutManager = LinearLayoutManager(this)
-        video_list.layoutManager = layoutManager
-        adapter = SimpleVideoListAdapter()
-        adapter.data = DataProviderImpl().provideVideos()
-        adapter.itemClickListener = object : SimpleVideoListAdapter.OnItemClickListener {
-            override fun onClick(video: Video) {
-                handleItemClick(video)
+        video_list.layoutManager = LinearLayoutManager(this)
+        adapter = SimpleVideoListAdapter().apply {
+            data = DataProviderImpl().provideVideos()
+            itemClickListener = object : SimpleVideoListAdapter.OnItemClickListener {
+                override fun onClick(video: Video) {
+                    handleItemClick(video)
+                }
             }
         }
         video_list.adapter = adapter
@@ -71,18 +68,14 @@ class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, 
 
     override fun onResume() {
         super.onResume()
-
-        val isFrameClosed = videoPageFrame?.isClosed ?: true
-        if (isFrameClosed) {
+        if (videoPageFrame?.isClosed != false) {
             startFloatingHelper()
         }
     }
 
     override fun onPause() {
         super.onPause()
-
-        val isFrameClosed = videoPageFrame?.isClosed ?: true
-        if (isFrameClosed) {
+        if (videoPageFrame?.isClosed != false) {
             floatingViewHelper?.stop()
         }
     }
@@ -90,8 +83,7 @@ class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, 
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         if (newConfig != null) {
-            val pageFrame = videoPageFrame
-            if (pageFrame == null) {
+            if (videoPageFrame == null) {
                 if (isFullScreenConfig(newConfig)) {
                     modifyFullScreenSettings(true)
                     floatingViewHelper?.enterFullScreen()
@@ -119,14 +111,6 @@ class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, 
         uiHandler.removeCallbacks(floatingViewStartRunnable)
     }
 
-    override fun onMinimized() {
-
-    }
-
-    override fun onMaximized() {
-
-    }
-
     override fun onClose() {
         videoPageFrame = null
         floatingPlayer.visibility = View.INVISIBLE
@@ -141,11 +125,7 @@ class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, 
             floatingPlayer.play(adapter.data[currentAdapterPosition].url)
         }
 
-        if (isVisible) {
-            floatingPlayer.visibility = View.VISIBLE
-        } else {
-            floatingPlayer.visibility = View.INVISIBLE
-        }
+        floatingPlayer.visibility = if (isVisible) View.VISIBLE else View.INVISIBLE
     }
 
     override fun getTargetView(): View? {
@@ -166,9 +146,7 @@ class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, 
         return itemView?.findViewById(R.id.image)
     }
 
-    override fun isViewOverCovered(target: View?): Boolean {
-        return false
-    }
+    override fun isViewOverCovered(target: View?) = false
 
     private fun modifyFullScreenSettings(isFullScreen: Boolean) {
         if (isFullScreen) {
@@ -186,26 +164,27 @@ class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, 
         if (floatingViewHelper == null) {
             floatingViewHelper = FloatingViewHelper()
         }
-        floatingViewHelper?.floatingView = floatingPlayer
-        floatingViewHelper?.recyclerView = video_list
-        floatingViewHelper?.topBorder = getTopBorder()
-        floatingViewHelper?.bottomBorder = 0
-        floatingViewHelper?.listener = this
+        floatingViewHelper?.apply {
+            floatingView = floatingPlayer
+            recyclerView = video_list
+            topBorder = getTopBorder()
+            bottomBorder = 0
+            listener = this@SimpleVideoListActivity
+        }
     }
 
     private fun initVideoPageFrame() {
-        bodyView = TextView(this)
-        bodyView?.setBackgroundColor(Color.GRAY)
-        bodyView?.setTextColor(Color.WHITE)
-        bodyView?.textSize = 35f
-
         videoPageFrame = ScalablePageFrame(this)
 
         val root = window.decorView as ViewGroup
-        videoPageFrame?.headRightMargin = 80
-        videoPageFrame?.headBottomMargin = 80
-        videoPageFrame?.init(floatingPlayer, bodyView!!, root)
-        videoPageFrame?.listener = this
+        videoPageFrame?.apply {
+            headRightMargin = 80
+            headBottomMargin = 80
+            setHead(floatingPlayer)
+            setBody(BodyFragment(), supportFragmentManager)
+            attach(root)
+            listener = this@SimpleVideoListActivity
+        }
     }
 
     private fun startFloatingHelper() {
@@ -230,16 +209,15 @@ class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, 
             floatingViewHelper?.stop()
             floatingPlayer.release()
 
-            floatingPlayer = ExoVideoPlayer(this)
-            floatingPlayer.play(adapter.data[currentAdapterPosition].url)
+            floatingPlayer = ExoVideoPlayer(this).apply { play(adapter.data[currentAdapterPosition].url) }
             initVideoPageFrame()
         } else {
             videoPageFrame?.maximize()
         }
-        bodyView?.text = video.title
+
         val source = adapter.data[currentAdapterPosition]
         if (source != video) {
-            floatingPlayer.play(adapter.data[currentAdapterPosition].url)
+            floatingPlayer.play(source.url)
         }
     }
 

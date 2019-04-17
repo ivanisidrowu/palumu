@@ -41,8 +41,10 @@ class SimpleVideoListAdapter: RecyclerView.Adapter<SimpleVideoListAdapter.VideoV
                     .apply(options)
                     .into(holder.image)
         }
-        holder?.title?.text = video.title
-        holder?.itemView?.setOnClickListener({itemClickListener?.onClick(video)})
+        holder?.apply {
+            title?.text = video.title
+            itemView?.setOnClickListener {itemClickListener?.onClick(video)}
+        }
     }
 
     override fun onViewRecycled(holder: VideoViewHolder?) {

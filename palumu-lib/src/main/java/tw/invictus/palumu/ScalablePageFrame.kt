@@ -3,12 +3,16 @@ package tw.invictus.palumu
 import android.content.Context
 import android.support.constraint.ConstraintLayout
 import android.support.constraint.ConstraintSet
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 import android.support.v4.view.MotionEventCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.ViewDragHelper
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import tw.invictus.palumu.R
 
 /**
@@ -27,16 +31,14 @@ import tw.invictus.palumu.R
  *
  * Created by ivan on 04/01/2018.
  */
-class ScalablePageFrame(context: Context?) : ConstraintLayout(context) {
-    var headView: View? = null
-    var bodyView: View? = null
+class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
+
     var isClosed = false
     var bottomPadding = 0
     var headRightMargin = 0
     var headBottomMargin = 0
     var listener: ScalablePageFrameListener? = null
 
-    private val tag = this.javaClass.simpleName
     private val dxThreshold = 5
     private val dyThreshold = 15
     private val headScaleFactor = 2f
@@ -44,15 +46,16 @@ class ScalablePageFrame(context: Context?) : ConstraintLayout(context) {
     private val minSlidingClickDistance = 10
     private val xViewReleaseThreshold = 0.25f
     private val yViewReleaseThreshold = 0.5f
-    private val headDimenRatio = "h,16:9"
     private val invalidPointer = -1
     private val dragHelper: ViewDragHelper
 
+    private var headView: FrameLayout
+    private var bodyView: FrameLayout
     private var verticalDragRange: Int = 0
     private var horizontalDragRange: Int = 0
     private var mTop: Int = 0
     private var mLeft: Int = 0
-    private var verticalDragOffset: Float = 0f
+    private var verticalDragOffset = 0f
     private var activePointerId = invalidPointer
     private var lastTouchActionDownXPosition = 0f
     private var rootViewGroup: ViewGroup? = null
@@ -61,74 +64,63 @@ class ScalablePageFrame(context: Context?) : ConstraintLayout(context) {
     private var draggable = true
 
     init {
-        dragHelper = ViewDragHelper.create(this, 1f, DragHelperCallback())
-    }
-
-    fun init(head: View, body: View, root: ViewGroup) {
-        head.id = R.id.video_page_frame_head
-        body.id = R.id.video_page_frame_body
-
-        addView(head)
-        addView(body)
-
-        val layoutParams = ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-
-        val constraintSet = ConstraintSet()
-        constraintSet.clone(this)
-        constraintSet.constrainWidth(R.id.video_page_frame_head, ConstraintSet.MATCH_CONSTRAINT)
-        constraintSet.constrainHeight(R.id.video_page_frame_head, ConstraintSet.MATCH_CONSTRAINT)
-        constraintSet.setDimensionRatio(R.id.video_page_frame_head, headDimenRatio)
-        constraintSet.connect(R.id.video_page_frame_head, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
-        constraintSet.connect(R.id.video_page_frame_head, ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT)
-        constraintSet.connect(R.id.video_page_frame_head, ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT)
-
-        constraintSet.constrainWidth(R.id.video_page_frame_body, ConstraintSet.MATCH_CONSTRAINT)
-        constraintSet.constrainHeight(R.id.video_page_frame_body, ConstraintSet.MATCH_CONSTRAINT)
-        constraintSet.connect(R.id.video_page_frame_body, ConstraintSet.TOP, R.id.video_page_frame_head, ConstraintSet.BOTTOM)
-        constraintSet.connect(R.id.video_page_frame_body, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
-        constraintSet.connect(R.id.video_page_frame_body, ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT)
-        constraintSet.connect(R.id.video_page_frame_body, ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT)
-        constraintSet.applyTo(this)
-
-        root.addView(this, layoutParams)
-        rootViewGroup = root
-
-        setPadding(0, 0, 0, bottomPadding)
-
+        inflate(context, R.layout.layout_scalable_page_frame, this)
         headView = findViewById(R.id.video_page_frame_head)
         bodyView = findViewById(R.id.video_page_frame_body)
+        val frame: ViewGroup = findViewById(R.id.frame)
+        dragHelper = ViewDragHelper.create(frame, 1f, DragHelperCallback())
+
+    }
+
+    fun attach(root: ViewGroup) {
+        root.addView(this, ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        rootViewGroup = root
+        setPadding(0, 0, 0, bottomPadding)
+    }
+
+    fun setHead(fragment: Fragment, fragmentManager: FragmentManager) {
+        val transaction = fragmentManager.beginTransaction()
+        transaction.replace(R.id.video_page_frame_head, fragment)
+        transaction.commit()
+    }
+
+    fun setHead(head: View) {
+        headView.addView(head, ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+    }
+
+    fun setBody(fragment: Fragment, fragmentManager: FragmentManager) {
+        val transaction = fragmentManager.beginTransaction()
+        transaction.replace(R.id.video_page_frame_body, fragment)
+        transaction.commit()
+    }
+
+    fun setBody(body: View) {
+        bodyView.addView(body, ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
     }
 
     fun enterFullScreen() {
-        val head = headView
-        val body = bodyView
-        if (!isMinimized() && head != null && body != null) {
+        if (!isMinimized()) {
             draggable = false
-
-            val layoutParams = head.layoutParams
-            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-
-            body.visibility = View.INVISIBLE
+            headView.layoutParams.apply {
+                width = ViewGroup.LayoutParams.MATCH_PARENT
+                layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
+            bodyView.visibility = View.INVISIBLE
             setPadding(0, 0 , 0, 0)
             invalidate()
         }
     }
 
     fun leaveFullScreen() {
-        val head = headView
-        val body = bodyView
-        if (head != null && body != null) {
-            draggable = true
-
-            val layoutParams = head.layoutParams
-            layoutParams.width = originHeadWidth
-            layoutParams.height = originHeadHeight
-
-            body.visibility = View.VISIBLE
-            setPadding(0, 0, 0, bottomPadding)
-            invalidate()
+        draggable = true
+        headView.layoutParams.apply {
+            width = originHeadWidth
+            height = originHeadHeight
+            visibility = View.VISIBLE
         }
+        bodyView.visibility = View.VISIBLE
+        setPadding(0, 0, 0, bottomPadding)
+        invalidate()
     }
 
     fun maximize() {
@@ -143,17 +135,22 @@ class ScalablePageFrame(context: Context?) : ConstraintLayout(context) {
         listener?.onMinimized()
     }
 
+    fun detach() {
+        rootViewGroup?.removeView(this)
+    }
+
     fun close() {
         isClosed = true
-        headView?.alpha = 1f
-        headView?.scaleX = 1f
-        headView?.scaleY = 1f
-        headView?.pivotX = 0f
-        headView?.pivotY = 0f
-
-        removeView(headView)
-        removeView(bodyView)
-        rootViewGroup?.removeView(this)
+        headView.apply {
+            alpha = 1f
+            scaleX = 1f
+            scaleY = 1f
+            pivotX = 0f
+            pivotY = 0f
+        }
+        headView.removeAllViews()
+        bodyView.removeAllViews()
+        detach()
         listener?.onClose()
         listener = null
     }
@@ -162,8 +159,8 @@ class ScalablePageFrame(context: Context?) : ConstraintLayout(context) {
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        originHeadWidth = headView?.width ?: 0
-        originHeadHeight = headView?.height ?: 0
+        originHeadWidth = headView.width
+        originHeadHeight = headView.height
     }
 
     override fun computeScroll() {
@@ -175,7 +172,7 @@ class ScalablePageFrame(context: Context?) : ConstraintLayout(context) {
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         if (!isEnabled) return false
 
-        when (MotionEventCompat.getActionMasked(ev) and MotionEventCompat.ACTION_MASK) {
+        when (ev.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
                 dragHelper.cancel()
                 return false
@@ -193,9 +190,8 @@ class ScalablePageFrame(context: Context?) : ConstraintLayout(context) {
     }
 
     override fun onTouchEvent(ev: MotionEvent): Boolean {
-        val actionMasked = MotionEventCompat.getActionMasked(ev)
-        if (actionMasked and MotionEventCompat.ACTION_MASK == MotionEvent.ACTION_DOWN) {
-            activePointerId = MotionEventCompat.getPointerId(ev, actionMasked)
+        if (ev.action and MotionEvent.ACTION_MASK == MotionEvent.ACTION_DOWN) {
+            activePointerId = ev.getPointerId(ev.action)
         }
         if (activePointerId == invalidPointer) {
             return false
@@ -204,13 +200,13 @@ class ScalablePageFrame(context: Context?) : ConstraintLayout(context) {
         if (isClosed) {
             return false
         }
-        val isDragViewHit = isViewHit(headView!!, ev.x.toInt(), ev.y.toInt())
-        val isSecondViewHit = isViewHit(bodyView!!, ev.x.toInt(), ev.y.toInt())
+        val isDragViewHit = isViewHit(headView, ev.x.toInt(), ev.y.toInt())
+        val isSecondViewHit = isViewHit(bodyView, ev.x.toInt(), ev.y.toInt())
         analyzeTouchToMaximizeIfNeeded(ev, isDragViewHit)
         if (!isMinimized()) {
-            headView?.dispatchTouchEvent(ev)
+            headView.dispatchTouchEvent(ev)
         } else {
-            headView?.dispatchTouchEvent(cloneMotionEventWithAction(ev, MotionEvent.ACTION_CANCEL))
+            headView.dispatchTouchEvent(cloneMotionEventWithAction(ev, MotionEvent.ACTION_CANCEL))
         }
         return isDragViewHit || isSecondViewHit
     }
@@ -227,20 +223,17 @@ class ScalablePageFrame(context: Context?) : ConstraintLayout(context) {
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         super.onLayout(changed, l, t, r, b)
-        val headHeight = headView?.height ?: 0
-        val scaleX = headView?.scaleX ?: 0f
-        verticalDragRange = height - headHeight - bottomPadding
-        horizontalDragRange = (width - width * scaleX).toInt()
-
-        headView?.layout(mLeft, mTop, mLeft + headView!!.measuredWidth, mTop + headView!!.measuredHeight)
-        bodyView?.layout(0, mTop + headView!!.measuredHeight, r, mTop + b)
+        verticalDragRange = height - headView.height - bottomPadding
+        horizontalDragRange = (width - headView.width * headView.scaleX).toInt()
+        headView.layout(mLeft, mTop, mLeft + headView.measuredWidth, mTop + headView.measuredHeight)
+        bodyView.layout(0, mTop + headView.measuredHeight, r, mTop + b)
     }
 
     private fun smoothSlideTo(slideOffset: Float): Boolean {
         val topBound = paddingTop
         val y = (topBound + slideOffset * verticalDragRange).toInt()
 
-        if (headView != null && dragHelper.smoothSlideViewTo(headView!!, headView!!.left, y)) {
+        if (dragHelper.smoothSlideViewTo(headView, headView.left, y)) {
             ViewCompat.postInvalidateOnAnimation(this)
             return true
         }
@@ -283,20 +276,13 @@ class ScalablePageFrame(context: Context?) : ConstraintLayout(context) {
                 screenY >= viewLocation[1] && screenY < viewLocation[1] + view.height
     }
 
-    private fun isHeadAtBottom(): Boolean {
-        val scaleX = headView?.scaleX ?: minScale
-        return scaleX == minScale
-    }
+    private fun isHeadAtBottom() = headView.scaleX == minScale
 
-    private fun isHeadAtRight(): Boolean {
-        return mLeft == 0
-    }
+    private fun isHeadAtRight() = mLeft == 0
 
     private inner class DragHelperCallback : ViewDragHelper.Callback() {
 
-        override fun tryCaptureView(child: View, pointerId: Int): Boolean {
-            return child === headView
-        }
+        override fun tryCaptureView(child: View, pointerId: Int) = child === headView
 
         override fun onViewPositionChanged(changedView: View, left: Int, top: Int, dx: Int, dy: Int) {
             if (isHeadAtBottom() && isHeadAtRight()) {
@@ -335,30 +321,25 @@ class ScalablePageFrame(context: Context?) : ConstraintLayout(context) {
             invalidate()
         }
 
-        override fun getViewVerticalDragRange(child: View): Int {
-            return verticalDragRange
-        }
+        override fun getViewVerticalDragRange(child: View) = verticalDragRange
 
-        override fun getViewHorizontalDragRange(child: View): Int {
-            return horizontalDragRange
-        }
+        override fun getViewHorizontalDragRange(child: View) = horizontalDragRange
 
         override fun clampViewPositionVertical(child: View, top: Int, dy: Int): Int {
             if ((isMinimized() && Math.abs(dy) >= dyThreshold)
                     || (!isMinimized() && !isHeadAtBottom())) {
                 val topBound = paddingTop
-                val headHeight = headView?.height ?: 0
-                val headPaddingBottom = headView?.paddingBottom ?: 0
+                val headHeight = headView.height
+                val headPaddingBottom = headView.paddingBottom
                 val bottomBound = height - headHeight - headPaddingBottom - bottomPadding
 
                 return Math.min(Math.max(top, topBound), bottomBound)
             }
-            val headHeight = headView?.measuredHeight ?: 0
-            return (measuredHeight - (headHeight * scaleX) - bottomPadding).toInt()
+            return (measuredHeight - (headView.measuredHeight * scaleX) - bottomPadding).toInt()
         }
 
         override fun clampViewPositionHorizontal(child: View, targetLeft: Int, dx: Int): Int {
-            var newLeft = headView?.left ?: 0
+            var newLeft = headView.left
 
             if ((isMinimized() && Math.abs(dx) > dxThreshold)
                     || (isHeadAtBottom() && !isHeadAtRight())) {
@@ -369,36 +350,32 @@ class ScalablePageFrame(context: Context?) : ConstraintLayout(context) {
         }
 
         private fun dragVertically(top: Int) {
-            val head = headView
-            val body = bodyView
-            if (head != null && body != null && draggable) {
+            if (draggable) {
                 mTop = top
-
                 verticalDragOffset = top.toFloat() / verticalDragRange
-
-                head.pivotX = head.width.toFloat() - headRightMargin
-                head.pivotY = head.height.toFloat() - headBottomMargin
-                head.scaleX = 1 - verticalDragOffset / headScaleFactor
-                head.scaleY = head.scaleX
-
-                body.alpha = 1 - verticalDragOffset
+                headView.apply {
+                    pivotX = width.toFloat() - headRightMargin
+                    pivotY = height.toFloat() - headBottomMargin
+                    scaleX = 1 - verticalDragOffset / headScaleFactor
+                    scaleY = scaleX
+                }
+                bodyView.alpha = 1 - verticalDragOffset
             }
         }
 
         private fun dragHorizontally(left: Int) {
-            val head = headView
-            if (head != null && draggable) {
+            if (draggable) {
                 mLeft = left
-                head.x = left.toFloat()
+                headView.x = left.toFloat()
 
                 if (mLeft < 0) {
                     val draggableRange = measuredWidth * (1 - minScale)
-                    head.alpha = 1 - (Math.abs(mLeft) / draggableRange)
+                    headView.alpha = 1 - (Math.abs(mLeft) / draggableRange)
                 } else {
-                    head.alpha = 1 - (mLeft / (measuredWidth * minScale))
+                    headView.alpha = 1 - (mLeft / (measuredWidth * minScale))
                 }
 
-                if (head.alpha <= 0) {
+                if (headView.alpha <= 0) {
                     close()
                 }
             }

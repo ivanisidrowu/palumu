@@ -40,8 +40,8 @@ class ExoVideoPlayer : FrameLayout {
     }
     private val buttonClickListener = OnClickListener {
         if (videoController.playPauseButton != null) {
-            val selected = videoController.playPauseButton!!.isSelected
-            videoController.playPauseButton!!.isSelected = !selected
+            val selected = videoController.playPauseButton?.isSelected ?: false
+            videoController.playPauseButton?.isSelected = !selected
         }
 
         exoPlayer.playWhenReady = !currentPlayWhenReady
