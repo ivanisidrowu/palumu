@@ -31,8 +31,7 @@ import tw.invictus.palumu.R
  *
  * Created by ivan on 04/01/2018.
  */
-class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
-
+open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
     var isClosed = false
     var bottomPadding = 0
     var headRightMargin = 0
