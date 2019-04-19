@@ -71,33 +71,33 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
 
     }
 
-    fun attach(root: ViewGroup) {
+    open fun attach(root: ViewGroup) {
         root.addView(this, ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         rootViewGroup = root
         setPadding(0, 0, 0, bottomPadding)
     }
 
-    fun setHead(fragment: Fragment, fragmentManager: FragmentManager) {
+    open fun setHead(fragment: Fragment, fragmentManager: FragmentManager) {
         val transaction = fragmentManager.beginTransaction()
         transaction.replace(R.id.video_page_frame_head, fragment)
         transaction.commit()
     }
 
-    fun setHead(head: View) {
+    open fun setHead(head: View) {
         headView.addView(head, ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
     }
 
-    fun setBody(fragment: Fragment, fragmentManager: FragmentManager) {
+    open fun setBody(fragment: Fragment, fragmentManager: FragmentManager) {
         val transaction = fragmentManager.beginTransaction()
         transaction.replace(R.id.video_page_frame_body, fragment)
         transaction.commit()
     }
 
-    fun setBody(body: View) {
+    open fun setBody(body: View) {
         bodyView.addView(body, ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
     }
 
-    fun enterFullScreen() {
+    open fun enterFullScreen() {
         if (!isMinimized()) {
             draggable = false
             headView.layoutParams.apply {
@@ -110,7 +110,7 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
         }
     }
 
-    fun leaveFullScreen() {
+    open fun leaveFullScreen() {
         draggable = true
         headView.layoutParams.apply {
             width = originHeadWidth
