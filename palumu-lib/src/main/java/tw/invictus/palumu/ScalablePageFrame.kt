@@ -2,18 +2,15 @@ package tw.invictus.palumu
 
 import android.content.Context
 import android.support.constraint.ConstraintLayout
-import android.support.constraint.ConstraintSet
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.view.MotionEventCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.ViewDragHelper
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import tw.invictus.palumu.R
 
 /**
  * Copyright 2018 Wu Yu Hao (Ivan Wu)
@@ -36,6 +33,7 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
     var bottomPadding = 0
     var headRightMargin = 0
     var headBottomMargin = 0
+    var isGestureEnabled = true
     var listener: ScalablePageFrameListener? = null
 
     private val dxThreshold = 5
@@ -171,6 +169,8 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         if (!isEnabled) return false
 
+        if (!isGestureEnabled) return super.onInterceptTouchEvent(ev)
+
         when (ev.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
                 dragHelper.cancel()
@@ -189,6 +189,8 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
     }
 
     override fun onTouchEvent(ev: MotionEvent): Boolean {
+        if (!isGestureEnabled) return super.onTouchEvent(ev)
+
         if (ev.action and MotionEvent.ACTION_MASK == MotionEvent.ACTION_DOWN) {
             activePointerId = ev.getPointerId(ev.action)
         }
