@@ -106,7 +106,6 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
                 layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
             }
             bodyView.visibility = View.INVISIBLE
-            setPadding(0, 0 , 0, 0)
 
             ConstraintSet().run {
                 clone(frame)
@@ -125,7 +124,6 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
             visibility = View.VISIBLE
         }
         bodyView.visibility = View.VISIBLE
-        setPadding(0, 0, 0, bottomPadding)
 
         ConstraintSet().run {
             clone(frame)
