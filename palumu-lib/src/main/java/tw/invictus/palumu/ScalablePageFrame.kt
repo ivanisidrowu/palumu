@@ -2,6 +2,7 @@ package tw.invictus.palumu
 
 import android.content.Context
 import android.support.constraint.ConstraintLayout
+import android.support.constraint.ConstraintSet
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.view.MotionEventCompat
@@ -44,8 +45,10 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
     private val xViewReleaseThreshold = 0.25f
     private val yViewReleaseThreshold = 0.5f
     private val invalidPointer = -1
+    private val headRatio = "h,16:9"
     private val dragHelper: ViewDragHelper
 
+    private var frame: ConstraintLayout
     private var headView: FrameLayout
     private var bodyView: FrameLayout
     private var verticalDragRange: Int = 0
@@ -64,7 +67,7 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
         inflate(context, R.layout.layout_scalable_page_frame, this)
         headView = findViewById(R.id.video_page_frame_head)
         bodyView = findViewById(R.id.video_page_frame_body)
-        val frame: ViewGroup = findViewById(R.id.frame)
+        frame = findViewById(R.id.frame)
         dragHelper = ViewDragHelper.create(frame, 1f, DragHelperCallback())
 
     }
@@ -104,19 +107,31 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
             }
             bodyView.visibility = View.INVISIBLE
             setPadding(0, 0 , 0, 0)
+
+            ConstraintSet().run {
+                clone(frame)
+                setDimensionRatio(R.id.video_page_frame_head, null)
+                applyTo(frame)
+            }
             invalidate()
         }
     }
 
     open fun leaveFullScreen() {
         draggable = true
-        headView.layoutParams.apply {
+        headView.layoutParams.run {
             width = originHeadWidth
             height = originHeadHeight
             visibility = View.VISIBLE
         }
         bodyView.visibility = View.VISIBLE
         setPadding(0, 0, 0, bottomPadding)
+
+        ConstraintSet().run {
+            clone(frame)
+            setDimensionRatio(R.id.video_page_frame_head, headRatio)
+            applyTo(frame)
+        }
         invalidate()
     }
 
