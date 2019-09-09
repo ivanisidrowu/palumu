@@ -82,7 +82,7 @@ allprojects {
 Then add this dependency to app's build.gradle file.
 ```gradle
 dependencies {
-  compile 'com.github.ivanisidrowu:palumu:0.9.4'
+  compile 'com.github.ivanisidrowu:palumu:0.9.5'
 }
 ```
 ## Contribution
