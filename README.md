@@ -87,8 +87,3 @@ dependencies {
 ```
 ## Contribution
 Contributions are always welcome. If you have any ideas or suggestions, you can contact me or create a github issue.
-
-## TODOs
-- [ ] Allow sharing floating views across activities.
-- [X] ScalablePageFrame supports taking fragments as the content of upper and lower view.
-- [ ] To implement new floating UI style as current Youtube APP UI
