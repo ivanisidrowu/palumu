@@ -13,14 +13,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="tw.invictus.sample.simple.SimpleVideoListActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize">
+            android:name="tw.invictus.sample.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name="tw.invictus.sample.simple.SimpleVideoListActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+        </activity>
+
+        <activity android:name="tw.invictus.sample.simple.DraggableFrameDemoActivity" />
     </application>
 
 </manifest>

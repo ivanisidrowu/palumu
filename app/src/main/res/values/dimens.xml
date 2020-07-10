@@ -4,4 +4,5 @@
     <dimen name="item_margin">10dp</dimen>
     <dimen name="item_title_size">20sp</dimen>
     <dimen name="option_item_height">100dp</dimen>
+    <dimen name="general_text_size">20sp</dimen>
 </resources>

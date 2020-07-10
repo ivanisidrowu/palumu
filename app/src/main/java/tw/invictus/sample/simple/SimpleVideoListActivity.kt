@@ -2,7 +2,6 @@ package tw.invictus.sample.simple
 
 import android.content.Context
 import android.content.res.Configuration
-import android.graphics.Color
 import android.graphics.Point
 import android.os.Bundle
 import android.os.Handler
@@ -13,13 +12,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.WindowManager
-import android.widget.TextView
 import com.google.android.exoplayer2.Player
 import kotlinx.android.synthetic.main.activity_simple_video_list.*
 import tw.invictus.palumu.FloatingViewHelper
 import tw.invictus.palumu.FloatingViewListener
+import tw.invictus.palumu.FrameListener
 import tw.invictus.palumu.ScalablePageFrame
-import tw.invictus.palumu.ScalablePageFrameListener
 import tw.invictus.sample.ExoVideoPlayer
 import tw.invictus.sample.R
 import tw.invictus.sample.data.DataProviderImpl
@@ -28,7 +26,7 @@ import tw.invictus.sample.data.Video
 /**
  * Created by ivan on 07/03/2018.
  */
-class SimpleVideoListActivity : AppCompatActivity(), ScalablePageFrameListener, FloatingViewListener {
+class SimpleVideoListActivity : AppCompatActivity(), FrameListener, FloatingViewListener {
 
     private lateinit var floatingPlayer: ExoVideoPlayer
     private lateinit var adapter: SimpleVideoListAdapter
