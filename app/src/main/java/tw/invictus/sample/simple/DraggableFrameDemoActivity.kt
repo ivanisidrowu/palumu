@@ -16,7 +16,7 @@ import tw.invictus.sample.data.Video
 class DraggableFrameDemoActivity : AppCompatActivity() {
 
     private lateinit var imageView: AppCompatImageView
-    private lateinit var adapter: SimpleVideoListAdapter
+    private lateinit var simpleVideoListAdapter: SimpleVideoListAdapter
 
     private var pageFrame: DraggablePageFrame? = null
 
@@ -26,7 +26,7 @@ class DraggableFrameDemoActivity : AppCompatActivity() {
 
         findViewById<RecyclerView>(R.id.video_list).apply {
             layoutManager = LinearLayoutManager(this@DraggableFrameDemoActivity)
-            adapter = SimpleVideoListAdapter().apply {
+            simpleVideoListAdapter = SimpleVideoListAdapter().apply {
                 data = DataProviderImpl().provideVideos()
                 itemClickListener = object : SimpleVideoListAdapter.OnItemClickListener {
                     override fun onClick(video: Video) {
@@ -34,7 +34,7 @@ class DraggableFrameDemoActivity : AppCompatActivity() {
                     }
                 }
             }
-            this.adapter = adapter
+            this.adapter = simpleVideoListAdapter
         }
 
         imageView = AppCompatImageView(this)
@@ -44,7 +44,7 @@ class DraggableFrameDemoActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        adapter.release()
+        simpleVideoListAdapter.release()
         imageView.setOnClickListener(null)
         pageFrame?.detach()
     }
