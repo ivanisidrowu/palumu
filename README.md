@@ -19,10 +19,11 @@ A floating view helper lib to let you create floating view above other views!
 
 Here is an example of how to create a floating view above a RecyclerView
 ```kotlin
-val floatingViewHelper = FloatingViewHelper()
-floatingViewHelper.floatingView = floatingPlayer
-floatingViewHelper.recyclerView = recyclerView
-floatingViewHelper.listener = listener
+val floatingViewHelper = FloatingViewHelper().apply {
+  floatingView = floatingPlayer
+  recyclerView = recyclerView
+  listener = listener
+}
 ```
 The listener is needed for helper to get the view followed by floating view.
 Please make sure you override getTargetView() in FloatingViewListener.
@@ -52,10 +53,11 @@ This class provides youtubish style view. It can be scaled and swipe-to-close. Y
 
 Add the frame into the specified view.
 ```kotlin
-val videoPageFrame = ScalablePageFrame(context)
-videoPageFrame.setHead(headView) // set head view or fragments
-videoPageFrame.setBody(bodyFragment) // set body view or fragments
-videoPageFrame.attach(root) // attach frame to root view
+val videoPageFrame = ScalablePageFrame(context).apply {
+  setHead(headView) // set head view or fragments
+  setBody(bodyFragment) // set body view or fragments
+  attach(root) // attach frame to root view
+}
 ```
 It also supports fullscreen, just add few lines of code into onConfigurationChanged.
 
@@ -67,6 +69,51 @@ videoPageFrame?.enterFullScreen()
 // Leave fullscreen (use it in activity onConfigurationChanged)
 videoPageFrame?.leaveFullScreen()
 ```
+
+Be careful! Don't forget to detach the frame when destroying the activity or fragment.
+```kotlin
+override fun onDestroy() {
+        super.onDestroy()
+        videoPageFrame?.detach()
+}
+```
+
+Other details could be found in ![wiki](https://github.com/ivanisidrowu/palumu/wiki/Document). You can also refer to ![the sample APP](https://github.com/ivanisidrowu/palumu/tree/master/app/src/main).
+
+### DraggablePageFrame
+
+It provides a frame container that can be maximized, minimized, and dragged on the screen.
+
+<img src="https://github.com/ivanisidrowu/palumu/blob/master/demo/draggable-demo.gif" width="216" height="384">
+
+The example below shows you how to initialize a `DraggablePageFrame`.
+
+```kotlin
+val pageFrame = DraggablePageFrame(this).apply {
+            setContentView(imageView)
+            val margin = resources.getDimensionPixelSize(R.dimen.item_margin)
+            setContentMargin(margin)
+            attach(root)
+        }
+```
+
+You can also set a `FrameListener` into it.
+```kotlin
+pageFrame.listener = object : FrameListener {
+    override fun onMinimized() {
+       // Do it!
+    }
+}
+```
+
+Be careful! Don't forget to detach the frame when destroying the activity or fragment.
+```kotlin
+override fun onDestroy() {
+        super.onDestroy()
+        pageFrame.detach()
+}
+```
+
 Other details could be found in ![wiki](https://github.com/ivanisidrowu/palumu/wiki/Document). You can also refer to ![the sample APP](https://github.com/ivanisidrowu/palumu/tree/master/app/src/main).
 
 ## Download
@@ -82,7 +129,7 @@ allprojects {
 Then add this dependency to app's build.gradle file.
 ```gradle
 dependencies {
-  compile 'com.github.ivanisidrowu:palumu:0.9.5'
+  compile 'com.github.ivanisidrowu:palumu:1.0.0'
 }
 ```
 ## Contribution
