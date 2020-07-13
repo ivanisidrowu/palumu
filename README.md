@@ -45,7 +45,7 @@ floatingViewHelper.enterFullScreen()
 // Leave fullscreen (use it in activity onConfigurationChanged)
 floatingViewHelper.leaveFullScreen()
 ```
-Other details could be found in ![wiki](https://github.com/ivanisidrowu/palumu/wiki/Document). You can also refer to ![the sample APP](https://github.com/ivanisidrowu/palumu/tree/master/app/src/main).
+Other details could be found in ![wiki](https://github.com/ivanisidrowu/palumu/wiki). You can also refer to ![the sample APP](https://github.com/ivanisidrowu/palumu/tree/master/app/src/main).
 
 ### ScalablePageFrame
 
@@ -78,7 +78,7 @@ override fun onDestroy() {
 }
 ```
 
-Other details could be found in ![wiki](https://github.com/ivanisidrowu/palumu/wiki/Document). You can also refer to ![the sample APP](https://github.com/ivanisidrowu/palumu/tree/master/app/src/main).
+Other details could be found in ![wiki](https://github.com/ivanisidrowu/palumu/wiki). You can also refer to ![the sample APP](https://github.com/ivanisidrowu/palumu/tree/master/app/src/main).
 
 ### DraggablePageFrame
 
@@ -114,7 +114,7 @@ override fun onDestroy() {
 }
 ```
 
-Other details could be found in ![wiki](https://github.com/ivanisidrowu/palumu/wiki/Document). You can also refer to ![the sample APP](https://github.com/ivanisidrowu/palumu/tree/master/app/src/main).
+Other details could be found in ![wiki](https://github.com/ivanisidrowu/palumu/wiki). You can also refer to ![the sample APP](https://github.com/ivanisidrowu/palumu/tree/master/app/src/main).
 
 ## Download
 Add this repo to the root build.gradle file.
