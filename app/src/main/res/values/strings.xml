@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Palumu</string>
+    <string name="scalable_frame_demo">ScalablePageFrame + FloatingViewHelper Demo</string>
+    <string name="draggable_frame_demo">DraggablePageFrame Demo</string>
 </resources>

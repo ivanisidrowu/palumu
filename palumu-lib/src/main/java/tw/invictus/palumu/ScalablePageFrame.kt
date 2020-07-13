@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import tw.invictus.palumu.extension.isViewHit
 
 /**
  * Copyright 2018 Wu Yu Hao (Ivan Wu)
@@ -29,13 +30,12 @@ import android.widget.FrameLayout
  *
  * Created by ivan on 04/01/2018.
  */
-open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
+open class ScalablePageFrame(context: Context) : PageFrameBase(context) {
     var isClosed = false
     var bottomPadding = 0
     var headRightMargin = 0
     var headBottomMargin = 0
     var isGestureEnabled = true
-    var listener: ScalablePageFrameListener? = null
 
     private val dxThreshold = 5
     private val dyThreshold = 15
@@ -58,7 +58,6 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
     private var verticalDragOffset = 0f
     private var activePointerId = invalidPointer
     private var lastTouchActionDownXPosition = 0f
-    private var rootViewGroup: ViewGroup? = null
     private var originHeadWidth = 0
     private var originHeadHeight = 0
     private var draggable = true
@@ -69,12 +68,10 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
         bodyView = findViewById(R.id.video_page_frame_body)
         frame = findViewById(R.id.frame)
         dragHelper = ViewDragHelper.create(frame, 1f, DragHelperCallback())
-
     }
 
-    open fun attach(root: ViewGroup) {
-        root.addView(this, ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-        rootViewGroup = root
+    override fun attach(root: ViewGroup) {
+        super.attach(root)
         setPadding(0, 0, 0, bottomPadding)
     }
 
@@ -133,20 +130,16 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
         invalidate()
     }
 
-    fun maximize() {
+    override fun maximize() {
         visibility = View.VISIBLE
         smoothSlideTo(0f)
-        listener?.onMaximized()
+        super.maximize()
     }
 
-    fun minimize() {
+    override fun minimize() {
         visibility = View.VISIBLE
         smoothSlideTo(1f)
-        listener?.onMinimized()
-    }
-
-    fun detach() {
-        rootViewGroup?.removeView(this)
+        super.minimize()
     }
 
     fun close() {
@@ -165,7 +158,7 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
         listener = null
     }
 
-    fun isMinimized() = isHeadAtBottom() && isHeadAtRight()
+    override fun isMinimized() = isHeadAtBottom() && isHeadAtRight()
 
     override fun onFinishInflate() {
         super.onFinishInflate()
@@ -225,16 +218,6 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
         return isDragViewHit || isSecondViewHit
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-
-        val maxWidth = View.MeasureSpec.getSize(widthMeasureSpec)
-        val maxHeight = View.MeasureSpec.getSize(heightMeasureSpec)
-
-        setMeasuredDimension(View.resolveSizeAndState(maxWidth, widthMeasureSpec, 0),
-                View.resolveSizeAndState(maxHeight, heightMeasureSpec, 0))
-    }
-
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         super.onLayout(changed, l, t, r, b)
         verticalDragRange = height - headView.height - bottomPadding
@@ -277,17 +260,6 @@ open class ScalablePageFrame(context: Context) : ConstraintLayout(context) {
         return (Math.abs(deltaX) < minSlidingClickDistance
                 && ev.action != MotionEvent.ACTION_MOVE
                 && isDragViewHit)
-    }
-
-    private fun isViewHit(view: View, x: Int, y: Int): Boolean {
-        val viewLocation = IntArray(2)
-        view.getLocationOnScreen(viewLocation)
-        val parentLocation = IntArray(2)
-        this.getLocationOnScreen(parentLocation)
-        val screenX = parentLocation[0] + x
-        val screenY = parentLocation[1] + y
-        return screenX >= viewLocation[0] && screenX < viewLocation[0] + view.width &&
-                screenY >= viewLocation[1] && screenY < viewLocation[1] + view.height
     }
 
     private fun isHeadAtBottom() = headView.scaleX == minScale
