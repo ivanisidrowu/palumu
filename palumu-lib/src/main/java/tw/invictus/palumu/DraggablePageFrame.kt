@@ -2,6 +2,7 @@ package tw.invictus.palumu
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.support.annotation.Dimension
 import android.support.constraint.ConstraintSet
 import android.support.transition.AutoTransition
 import android.support.transition.TransitionManager
@@ -55,7 +56,7 @@ open class DraggablePageFrame(context: Context) : PageFrameBase(context) {
     }
 
     init {
-        dragHelper = ViewDragHelper.create(this, 1f, DragHelperCallback())
+        dragHelper = ViewDragHelper.create(this, DragHelperCallback())
     }
 
     fun setContentView(view: View) {
@@ -68,14 +69,12 @@ open class DraggablePageFrame(context: Context) : PageFrameBase(context) {
             connect(view.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
             connect(view.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
             connect(view.id, ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT)
-            constrainWidth(view.id, ConstraintSet.MATCH_CONSTRAINT)
-            constrainHeight(view.id, ConstraintSet.MATCH_CONSTRAINT)
             applyTo(this@DraggablePageFrame)
         }
-        invalidate()
+        requestLayout()
     }
 
-    fun setContentMargin(margin: Int) {
+    fun setContentMargin(@Dimension(unit = Dimension.PX) margin: Int) {
         contentTopMargin = margin
         contentLeftMargin = margin
         contentRightMargin = margin

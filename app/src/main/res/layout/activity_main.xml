@@ -6,7 +6,7 @@
 
     <Button
         android:id="@+id/scalable_frame_demo"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/scalable_frame_demo"
         android:textSize="@dimen/general_text_size"
@@ -17,7 +17,7 @@
 
     <Button
         android:id="@+id/draggable_frame_demo"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/draggable_frame_demo"
         android:textSize="@dimen/general_text_size"

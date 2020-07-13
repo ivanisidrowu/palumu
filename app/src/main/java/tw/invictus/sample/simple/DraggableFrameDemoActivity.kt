@@ -6,8 +6,7 @@ import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
+import android.widget.ImageView
 import tw.invictus.palumu.DraggablePageFrame
 import tw.invictus.sample.R
 import tw.invictus.sample.data.DataProviderImpl
@@ -37,9 +36,10 @@ class DraggableFrameDemoActivity : AppCompatActivity() {
             this.adapter = simpleVideoListAdapter
         }
 
-        imageView = AppCompatImageView(this)
-        val options = RequestOptions().centerCrop()
-        Glide.with(this).load(R.drawable.sample).apply(options).into(imageView)
+        imageView = AppCompatImageView(this).apply {
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            setImageResource(R.drawable.sample)
+        }
     }
 
     override fun onDestroy() {

@@ -9,6 +9,8 @@ fun View.isViewHit(target: View, x: Int, y: Int): Boolean {
     getLocationOnScreen(parentLocation)
     val screenX = parentLocation[0] + x
     val screenY = parentLocation[1] + y
-    return screenX >= viewLocation[0] && screenX < viewLocation[0] + target.width &&
-            screenY >= viewLocation[1] && screenY < viewLocation[1] + target.height
+    return screenX >= viewLocation[0]
+            && (screenX < viewLocation[0] + target.width)
+            && screenY >= viewLocation[1]
+            && (screenY < viewLocation[1] + target.height)
 }
