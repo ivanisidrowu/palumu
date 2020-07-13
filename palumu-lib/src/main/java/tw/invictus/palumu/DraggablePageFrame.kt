@@ -122,7 +122,7 @@ open class DraggablePageFrame(context: Context) : PageFrameBase(context) {
             }
         }
         val interceptTap = dragHelper.isViewUnder(contentView, ev.x.toInt(), ev.y.toInt())
-        return dragHelper.shouldInterceptTouchEvent(ev) || interceptTap
+        return interceptTap || dragHelper.shouldInterceptTouchEvent(ev)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -160,8 +160,8 @@ open class DraggablePageFrame(context: Context) : PageFrameBase(context) {
         return isDragViewHit
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
         val view = contentView ?: return
 
         startConstraintSet.run {
@@ -171,11 +171,6 @@ open class DraggablePageFrame(context: Context) : PageFrameBase(context) {
             constrainWidth(view.id, measuredWidth)
             constrainHeight(view.id, measuredHeight)
         }
-    }
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        val view = contentView ?: return
 
         endConstraintSet.run {
             clear(view.id)
