@@ -131,7 +131,7 @@ allprojects {
 Then add this dependency to app's build.gradle file.
 ```gradle
 dependencies {
-  compile 'com.github.ivanisidrowu:palumu:1.0.0'
+  compile 'com.github.ivanisidrowu:palumu:v1.0.0'
 }
 ```
 ## Contribution
