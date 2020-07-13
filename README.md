@@ -12,6 +12,8 @@ A floating view helper lib to let you create floating view above other views!
 
 ![](https://github.com/ivanisidrowu/palumu/blob/master/demo/palumu-demo.gif)
 
+<img src="https://github.com/ivanisidrowu/palumu/blob/master/demo/draggable-demo.gif" width="216" height="384">
+
 ## Components
 ### FloatingViewHelper
 
